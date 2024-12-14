@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <title>RPG Magic System</title>
+    <style>
+        body {
+            font-family: Questrial, Arial, sans-serif;
+            font-size: 24px;
+            margin: 20px;
+        }
+        #resultBox {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .diceValues, .dicePoolSummary {
+            margin-top: 10px;
+            font-size: 24px; /* Match the size of other text */
+            font-family: Arial, sans-serif; /* Ensure it matches the body font */
+        }
+    </style>
+</head>
+<body>
+    <h1>RPG Magic System</h1>
+    <p>
+        Number of dice: 
+        <input type="range" id="diceSlider" min="1" max="10" value="1" oninput="updateSliderValue()"> 
+        <span id="sliderValue">1</span>
+    </p>
+    <button onclick="rollDice()">Roll Dice</button>
+    
+    <div id="resultBox">
+        <div class="diceValues" id="diceValues"></div>
+        <strong>Result:</strong> <span id="resultText">Roll the dice to see results!</span>
+        <div class="dicePoolSummary" id="dicePoolSummary"></div>
+    </div>
+
+    <script>
+        function updateSliderValue() {
+            // Update the value displayed next to the slider
+            const slider = document.getElementById('diceSlider');
+            const sliderValue = document.getElementById('sliderValue');
+            sliderValue.textContent = slider.value;
+        }
+
+        function rollDice() {
+            const numDice = parseInt(document.getElementById('diceSlider').value, 10);
+            let totalSixes = 0;
+            let totalOnes = 0;
+            const diceResults = [];
+            let discardedDice = 0;
+            let keptDice = 0;
+
+            // Roll the dice and process results
+            for (let i = 0; i < numDice; i++) {
+                const roll = Math.floor(Math.random() * 6) + 1; // Roll a 6-sided die
+                diceResults.push(roll); // Store the roll result
+                if (roll === 6) totalSixes++;
+                if (roll === 1) totalOnes++;
+
+                // Determine whether the die is discarded or kept
+                if (roll === 1 || roll === 2) {
+                    discardedDice++;
+                } else {
+                    keptDice++;
+                }
+            }
+
+            const spellPower = numDice + totalSixes; // Calculate spell power
+            let resultMessage = `Spell Power: ${spellPower}. `;
+            
+            if (totalOnes > 1) {
+                const mishapLevel = totalOnes - 1;
+                resultMessage += `There was a level ${mishapLevel} mishap with the spell! <p>`;
+            } else {
+                resultMessage += "The spell was cast successfully!";
+            }
+
+            // Update the individual dice results FIRST
+            const diceValuesElement = document.getElementById('diceValues');
+	    diceValuesElement.innerHTML = `Dice Rolls: [${diceResults.join(', ')}]<br><br>`;
+
+            // Update the result text
+            document.getElementById('resultText').textContent = resultMessage;
+
+            // Display the dice pool summary
+            document.getElementById('dicePoolSummary').textContent = `Kept Dice: ${keptDice}, Discarded Dice: ${discardedDice}`;
+        }
+    </script>
+</body>
+</html>
